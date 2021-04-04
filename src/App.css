@@ -40,6 +40,15 @@ body {
   border-radius: 8px;
 }
 
+.cell-replay {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  background-color: #dfe4ea;
+  border: 2px solid#158CCD;
+  border-radius: 8px;
+}
+
 .cell:hover {
   cursor: pointer;
 }
@@ -52,14 +61,6 @@ svg.fa-times {
   transform: translate(-50%, -50%);
 }
 
-h1.turnLabel {
-  font-size: 50px;
-  color: white;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
 
 span.ant-tag-processing {
   margin-top: 10px;

@@ -10,13 +10,15 @@ import { NewGameModal } from "../components/NewGameModal";
 import { Board } from "../components/Board";
 import { createWinnerCondition, calculateWinner } from "../Calculator";
 import ResultModal from "../components/ResultModal";
+import db from "../firebase";
 
 const { Content } = Layout;
 
 export const Home = () => {
-  const [squareSize, setSquareSize] = useState(3);
+  const [order, setOrder] = useState(0);
+  const [squareSize, setSquareSize] = useState(3); //Default size = 3x3
   const [squareData, setSquareData] = useState([]);
-  const [currentTurn, setCurrentTurn] = useState("X");
+  const [currentTurn, setCurrentTurn] = useState("X"); //Default player = X
   const [result, setResult] = useState("");
   const [newGameModal, setNewGameModal] = useState({
     visible: false,
@@ -52,11 +54,12 @@ export const Home = () => {
         squares[index].value = "O";
         setCurrentTurn("X");
       }
+      squares[index].order = order;
+      setOrder(order+1);
       switch (calculateWinner(squares, currentTurn, squareSize)) {
         case "X":
           setResult("X");
           setTimeout(function(){ showResultModal(); }, 500);
-          
           break;
         case "O":
           setResult("O");
@@ -176,6 +179,8 @@ export const Home = () => {
         handleCancel={handleResultCancel}
         handleOk={handleResultOk}
         result={result}
+        size={squareSize}
+        square={squareData}
       />
     </Content>
   );

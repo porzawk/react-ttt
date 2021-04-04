@@ -1,8 +1,43 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Table, Tag, Space } from "antd";
 import { CaretRightOutlined } from "@ant-design/icons";
+import db from "../firebase";
+import { ReplayModal } from './ReplayModal';
 
 export const HistoryTable = () => {
+  const [history, setHistory] = useState([]);
+  const [replayModal, setReplayModal] = useState({ visible: false });
+
+  useEffect(() => {
+    db.collection("history")
+      .orderBy("timestamp", "desc")
+      .onSnapshot((snapshot) =>
+        setHistory(
+          snapshot.docs.map((doc) => ({
+            key: doc.id,
+            id: doc.id,
+            timestamp: doc.data().timestamp,
+            size: doc.data().size,
+            result: doc.data().result,
+          }))
+        )
+      );
+  }, []);
+
+  const handleCancel = () => {
+    setReplayModal({
+      visible: false,
+    });
+  };
+
+  const showModal = (value) => {
+    setReplayModal({
+      id:value.key,
+      size:value.size,
+      visible: true,
+    });
+  };
+
   const columns = [
     {
       title: "Timestamp",
@@ -13,6 +48,7 @@ export const HistoryTable = () => {
       title: "Size",
       dataIndex: "size",
       key: "size",
+      render: size => `${size}x${size}`
     },
     {
       title: "Result",
@@ -41,9 +77,9 @@ export const HistoryTable = () => {
     {
       title: "",
       key: "action",
-      render: (text, record) => (
+      render: (id) => (
         <Space size="middle">
-          <a>
+          <a onClick={() => showModal(id)}>
             {" "}
             <CaretRightOutlined /> Replay
           </a>
@@ -52,30 +88,20 @@ export const HistoryTable = () => {
     },
   ];
 
-  const data = [
-    {
-      key: "1",
-      timestamp: "2021-04-03 22:32",
-      size: "3x3",
-      result: "X",
-    },
-    {
-      key: "2",
-      timestamp: "2021-04-03 22:31",
-      size: "3x3",
-      result: "O",
-    },
-    {
-      key: "3",
-      timestamp: "2021-04-03 22:30",
-      size: "3x3",
-      result: "D",
-    },
-  ];
-
   return (
     <>
-      <Table columns={columns} dataSource={data} pagination={false} bordered />
+      <Table
+        columns={columns}
+        dataSource={history}
+        pagination={false}
+        bordered
+      />
+      <ReplayModal
+        docId={replayModal.id}
+        size={replayModal.size}
+        visible={replayModal.visible}
+        handleCancel={handleCancel}
+      />
     </>
   );
 };
