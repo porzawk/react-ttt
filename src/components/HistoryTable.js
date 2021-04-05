@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { Table, Tag, Space } from "antd";
-import { CaretRightOutlined } from "@ant-design/icons";
+import { Table, Tag, Space, Popconfirm } from "antd";
+import { CaretRightOutlined, DeleteOutlined } from "@ant-design/icons";
 import db from "../firebase";
-import { ReplayModal } from './ReplayModal';
+import { ReplayModal } from "./ReplayModal";
 
 export const HistoryTable = () => {
   const [history, setHistory] = useState([]);
   const [replayModal, setReplayModal] = useState({ visible: false });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     db.collection("history")
       .orderBy("timestamp", "desc")
       .onSnapshot((snapshot) =>
-        setHistory(
+        getData(
           snapshot.docs.map((doc) => ({
             key: doc.id,
             id: doc.id,
@@ -24,6 +25,11 @@ export const HistoryTable = () => {
       );
   }, []);
 
+  const getData = (data) => {
+    setHistory(data);
+    setLoading(false);
+  };
+
   const handleCancel = () => {
     setReplayModal({
       visible: false,
@@ -32,12 +38,15 @@ export const HistoryTable = () => {
 
   const showModal = (value) => {
     setReplayModal({
-      id:value.key,
-      size:value.size,
+      id: value.key,
+      size: value.size,
       visible: true,
     });
   };
 
+  const deleteHistory = (value) => {
+    db.collection("history").doc(value.key).delete();
+  };
   const columns = [
     {
       title: "Timestamp",
@@ -48,7 +57,7 @@ export const HistoryTable = () => {
       title: "Size",
       dataIndex: "size",
       key: "size",
-      render: size => `${size}x${size}`
+      render: (size) => `${size}x${size}`,
     },
     {
       title: "Result",
@@ -83,6 +92,17 @@ export const HistoryTable = () => {
             {" "}
             <CaretRightOutlined /> Replay
           </a>
+          <Popconfirm
+            placement="top"
+            title="Are you sure to delete?"
+            onConfirm={() => deleteHistory(id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <a>
+              <DeleteOutlined style={{ color: '#eb2f96' }} />
+            </a>
+          </Popconfirm>
         </Space>
       ),
     },
@@ -91,6 +111,8 @@ export const HistoryTable = () => {
   return (
     <>
       <Table
+        title={() => "Histories"}
+        loading={loading}
         columns={columns}
         dataSource={history}
         pagination={false}

@@ -75,6 +75,7 @@ export const Home = () => {
   };
 
   const handleNewGameOk = (size) => {
+    setOrder(0);
     setResult("");
     setCurrentTurn("X");
     setSquareSize(size);
@@ -102,6 +103,7 @@ export const Home = () => {
   };
 
   const handleResultOk = () => {
+    setOrder(0);
     setResult("");
     initSquare();
     setCurrentTurn("X");
@@ -117,6 +119,7 @@ export const Home = () => {
   };
 
   const onResetClick = () => {
+    setOrder(0);
     setResult("");
     initSquare();
     setCurrentTurn("X");
